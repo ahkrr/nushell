@@ -347,6 +347,8 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut ConfigDeserializer<'de> {
             let json = serde_json::to_string(&val)?;
             let json_cursor = std::io::Cursor::new(json.into_bytes());
             let mut json_de = serde_json::Deserializer::from_reader(json_cursor);
+            json_de.disable_recursion_limit();
+            let json_de = serde_stacker::Deserializer::new(&mut json_de);
             let r = json_de.deserialize_struct(name, fields, visitor)?;
             Ok(r)
         }
